@@ -16,8 +16,8 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
             containerDefinition.Bind<PowerWheelFragment>().AsSingleton();
             containerDefinition.Bind<AttachPowerWheelToGravityBatteryButton>().AsSingleton();
             containerDefinition.Bind<AttachPowerWheelToGravityBatteryFragment>().AsSingleton();
-            //containerDefinition.Bind<TriggersFragment>().AsSingleton();
             containerDefinition.Bind<LinkViewFactory>().AsSingleton();
+            containerDefinition.Bind<GravityBatteryLinksFragment>().AsSingleton();
             containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
         }
 
@@ -27,16 +27,19 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
         private class EntityPanelModuleProvider : IProvider<EntityPanelModule>
         {
             private readonly PowerWheelFragment _powerWheelFragment;
+            private readonly GravityBatteryLinksFragment _gravityBatteryLinksFragment;
 
-            public EntityPanelModuleProvider(PowerWheelFragment powerWheelFragment)
+            public EntityPanelModuleProvider(PowerWheelFragment powerWheelFragment, GravityBatteryLinksFragment gravityBatteryLinksFragment)
             {
                 _powerWheelFragment = powerWheelFragment;
+                _gravityBatteryLinksFragment = gravityBatteryLinksFragment;
             }
 
             public EntityPanelModule Get()
             {
                 EntityPanelModule.Builder builder = new EntityPanelModule.Builder();
                 builder.AddBottomFragment(_powerWheelFragment);
+                builder.AddBottomFragment(_gravityBatteryLinksFragment);
                 return builder.Build();
             }
         }

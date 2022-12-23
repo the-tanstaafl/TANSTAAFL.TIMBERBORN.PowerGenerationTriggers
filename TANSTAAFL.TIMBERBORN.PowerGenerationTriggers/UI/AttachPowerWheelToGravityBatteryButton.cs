@@ -63,8 +63,6 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
         /// <param name="createdLinkCallback"></param>
         private void StartAttachGravityBattery(PowerWheelMonoBehaviour powerWheel, Action createdLinkCallback)
         {
-            PowerGenerationTriggersPlugin.Log.LogInfo("StartAttachGravityBattery 1.0");
-
             _pickObjectTool.StartPicking<GravityBatteryMonoBehaviour>(
                 _loc.T(PickGravityBatteryTitleLocKey),
                 _loc.T(PickGravityBatteryTipLocKey),
@@ -74,22 +72,9 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
                     FinishGravityBatterySelection(powerWheel, gravityBattery, createdLinkCallback);
                 });
 
-            PowerGenerationTriggersPlugin.Log.LogInfo("StartAttachGravityBattery 2");
-
             var powerWhellGameObject = powerWheel.gameObject;
 
-            PowerGenerationTriggersPlugin.Log.LogInfo("StartAttachGravityBattery 3.1");
-
-            if (!_selectionManager)
-            {
-                PowerGenerationTriggersPlugin.Log.LogInfo("_selectionManager IS NULL");
-            }
-
-            PowerGenerationTriggersPlugin.Log.LogInfo("StartAttachGravityBattery 3.2");
-
             _selectionManager.Select(powerWhellGameObject);
-
-            PowerGenerationTriggersPlugin.Log.LogInfo("StartAttachGravityBattery 4");
         }
 
         /// <summary>

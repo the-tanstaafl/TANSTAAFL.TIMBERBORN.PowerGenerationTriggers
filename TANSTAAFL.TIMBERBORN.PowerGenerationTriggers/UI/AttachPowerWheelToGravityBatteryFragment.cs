@@ -53,11 +53,6 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
                                                   .Where(x => x.name.StartsWith("GravityBattery"))
                                                   .SingleOrDefault();
 
-            if (!_gravityBatterySprite)
-            {
-                PowerGenerationTriggersPlugin.Log.LogWarning("NO _gravityBatterySprite");
-            }
-
             var root = _builder.CreateComponentBuilder()
                                .CreateVisualElement()
                                .SetName("LinksScrollView")
@@ -89,21 +84,12 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
 
         public void ClearFragment()
         {
-            PowerGenerationTriggersPlugin.Log.LogInfo("ClearFragment: _powerWheelMonoBehaviour CLEARED");
-
             _powerWheelMonoBehaviour = null;
             RemoveAllGravityBatteryViews();
         }
 
         public void ShowFragment(PowerWheelMonoBehaviour powerWheelMonoBehaviour)
         {
-            PowerGenerationTriggersPlugin.Log.LogInfo("ShowFragment: _powerWheelMonoBehaviour SET");
-
-            if (!powerWheelMonoBehaviour)
-            {
-                PowerGenerationTriggersPlugin.Log.LogWarning("ShowFragment: FUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
-            }
-
             _powerWheelMonoBehaviour = powerWheelMonoBehaviour;
             AddAllGravityBatteryViews();
         }
