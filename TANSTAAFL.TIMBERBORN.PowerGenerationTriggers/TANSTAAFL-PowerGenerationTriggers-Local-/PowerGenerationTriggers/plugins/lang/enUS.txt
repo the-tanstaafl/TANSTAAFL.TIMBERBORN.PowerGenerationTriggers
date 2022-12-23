@@ -1,0 +1,5 @@
+﻿ID,Text,Comment
+PowerGenerationTriggers.AttachToGravityBattery, Attach Gravity Battery
+PowerGenerationTriggers.PickGravityBatteryTitle, Pick a Gravity Battery
+PowerGenerationTriggers.PickGravityBatteryTip, "No really, pick any."
+PowerGenerationTriggers.NoLinks, No Gravity Battery attached
