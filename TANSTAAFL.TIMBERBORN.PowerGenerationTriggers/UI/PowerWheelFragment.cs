@@ -58,9 +58,9 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
             _links = _root.Q<VisualElement>("Placeholder");
             _links.Add(_attachPowerWheelToGravityBatteryFragment.InitiliazeFragment(_root));
 
-            _root.ToggleDisplayStyle(true);
+            _root.ToggleDisplayStyle(false);
 
-            _root.Q<Button>("NewGravityBatteryButton").ToggleDisplayStyle(true);
+            //_root.Q<Button>("NewGravityBatteryButton").ToggleDisplayStyle(true);
 
             return _root;
         }
@@ -71,6 +71,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
             if ((bool)_powerWheelMono)
             {
                 _attachPowerWheelToGravityBatteryFragment.ShowFragment(_powerWheelMono);
+                _root.ToggleDisplayStyle(visible: true);
             }
         }
 
