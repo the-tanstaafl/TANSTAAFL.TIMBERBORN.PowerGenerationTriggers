@@ -12,10 +12,11 @@ using Timberborn.CoreUI;
 using Timberborn.PrefabSystem;
 using System.Collections.ObjectModel;
 using Timberborn.Common;
+using TimberApi.EntityLinkerSystem;
 
 namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
 {
-    public class GravityBatteryLinksFragment : IEntityPanelFragment
+    public class GravityBatteryLinksFragment<T> : IEntityPanelFragment
     {
         private readonly UIBuilder _builder;
 
@@ -23,13 +24,14 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
         private ScrollView _links;
         private Label _noLinks;
 
-        private GravityBatteryMonoBehaviour _gravityBatteryMonoBehaviour;
+        protected EntityLinker _entityLinker;
 
-        private VisualElement _linksView;
         private Sprite _powerWheelSprite;
 
         LinkViewFactory _linkViewFactory;
         private readonly SelectionManager _selectionManager;
+
+        private T _component;
 
         public GravityBatteryLinksFragment(
             UIBuilder builder,
@@ -40,6 +42,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
             _linkViewFactory = linkViewFactory;
             _selectionManager = selectionManager;
         }
+
         public VisualElement InitializeFragment()
         {
             _powerWheelSprite = (Sprite)Resources.LoadAll("Buildings", typeof(Sprite))
@@ -89,21 +92,24 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
 
         public void ShowFragment(GameObject entity)
         {
-            _gravityBatteryMonoBehaviour = entity.GetComponent<GravityBatteryMonoBehaviour>();
-            if ((bool)_gravityBatteryMonoBehaviour)
+            _entityLinker = entity.GetComponent<EntityLinker>();
+            _component = entity.GetComponent<T>();
+
+            if ((bool)_entityLinker && _component != null)
             {
                 UpdateLinks();
             }
         }
         public void ClearFragment()
         {
-            _gravityBatteryMonoBehaviour = null;
+            _entityLinker = null;
             _root.ToggleDisplayStyle(visible: false);
+            RemoveAllLinksViews();
         }
 
         public void UpdateFragment()
         {
-            if ((bool)_gravityBatteryMonoBehaviour)
+            if ((bool)_entityLinker && _component != null)
             {
                 _root.ToggleDisplayStyle(visible: true);
             }
@@ -114,13 +120,11 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
         /// </summary>
         public void UpdateLinks()
         {
-            ReadOnlyCollection<PowerWheelGravityBatteryLink> links = _gravityBatteryMonoBehaviour.PowerWheelLinks;
-
             _links.Clear();
 
-            foreach (var link in links)
+            foreach (var link in _entityLinker.EntityLinks)
             {
-                var powerWheel = link.PowerWheel.gameObject;
+                var powerWheel = link.Linker.gameObject;
                 var labeledPrefab = powerWheel.GetComponent<LabeledPrefab>();
                 var view = _linkViewFactory.CreateViewForGravityBattery(labeledPrefab.DisplayNameLocKey);
 
@@ -137,25 +141,22 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
 
                 view.Q<Button>("DetachLinkButton").clicked += delegate
                 {
-                    link.PowerWheel.DetachLink(link);
+                    link.Linker.DeleteLink(link);
                     UpdateLinks();
                 };
 
                 _links.Add(view);
             }
-            if (links.IsEmpty())
+            if (_entityLinker.EntityLinks.IsEmpty())
             {
                 _links.Add(_noLinks);
             }
             UpdateFragment();
         }
 
-        /// <summary>
-        /// Removes all existing floodagate link views
-        /// </summary>
-        public void RemoveAllStreamGaugeViews()
+        public void RemoveAllLinksViews()
         {
-            _linksView.Clear();
+            _links.Clear();
         }
     }
 }

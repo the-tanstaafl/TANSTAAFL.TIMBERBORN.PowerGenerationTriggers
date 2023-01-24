@@ -2,9 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.EntityAction;
 using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
+using Timberborn.Buildings;
 using Timberborn.EntityPanelSystem;
+using Timberborn.PowerGenerating;
+using Timberborn.TemplateSystem;
 
 namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
 {
@@ -13,11 +17,11 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
     {
         public void Configure(IContainerDefinition containerDefinition)
         {
-            containerDefinition.Bind<PowerWheelFragment>().AsSingleton();
-            containerDefinition.Bind<AttachPowerWheelToGravityBatteryButton>().AsSingleton();
-            containerDefinition.Bind<AttachPowerWheelToGravityBatteryFragment>().AsSingleton();
+            containerDefinition.Bind<LinkerFragment<BeaverPoweredGenerator>>().AsSingleton();
+            containerDefinition.Bind<EntityLinkViewFactory>().AsSingleton();
+            containerDefinition.Bind<StartLinkingButton>().AsSingleton();
             containerDefinition.Bind<LinkViewFactory>().AsSingleton();
-            containerDefinition.Bind<GravityBatteryLinksFragment>().AsSingleton();
+            containerDefinition.Bind<GravityBatteryLinksFragment<GravityBatteryRegisteredComponent>>().AsSingleton();
             containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
         }
 
@@ -26,20 +30,20 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
         /// </summary>
         private class EntityPanelModuleProvider : IProvider<EntityPanelModule>
         {
-            private readonly PowerWheelFragment _powerWheelFragment;
-            private readonly GravityBatteryLinksFragment _gravityBatteryLinksFragment;
+            private readonly LinkerFragment<BeaverPoweredGenerator> _linkerFragment;
+            private readonly GravityBatteryLinksFragment<GravityBatteryRegisteredComponent> _gravityBatteryFragment;
 
-            public EntityPanelModuleProvider(PowerWheelFragment powerWheelFragment, GravityBatteryLinksFragment gravityBatteryLinksFragment)
+            public EntityPanelModuleProvider(LinkerFragment<BeaverPoweredGenerator> linkerFragment, GravityBatteryLinksFragment<GravityBatteryRegisteredComponent> gravityBatteryFragment)
             {
-                _powerWheelFragment = powerWheelFragment;
-                _gravityBatteryLinksFragment = gravityBatteryLinksFragment;
+                _linkerFragment = linkerFragment;
+                _gravityBatteryFragment = gravityBatteryFragment;
             }
 
             public EntityPanelModule Get()
             {
                 EntityPanelModule.Builder builder = new EntityPanelModule.Builder();
-                builder.AddBottomFragment(_powerWheelFragment);
-                builder.AddBottomFragment(_gravityBatteryLinksFragment);
+                builder.AddBottomFragment(_linkerFragment);
+                builder.AddBottomFragment(_gravityBatteryFragment);
                 return builder.Build();
             }
         }
