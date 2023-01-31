@@ -11,6 +11,7 @@ using TimberApi.DependencyContainerSystem;
 using TimberApi.SceneSystem;
 using Timberborn.EntitySystem;
 using Timberborn.IrrigationSystem;
+using Timberborn.MechanicalSystem;
 using Timberborn.PowerGenerating;
 using Timberborn.PowerStorage;
 using Timberborn.TemplateSystem;
@@ -32,6 +33,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers
             TemplateModule.Builder builder = new TemplateModule.Builder();
             builder.AddDecorator<BeaverPoweredGenerator, BeaverPoweredGeneratorService>();
             builder.AddDecorator<GravityBattery, GravityBatteryRegisteredComponent>();
+            builder.AddDecorator<MechanicalNode, PowerShaftPausable>();
             return builder.Build();
         }
     }
