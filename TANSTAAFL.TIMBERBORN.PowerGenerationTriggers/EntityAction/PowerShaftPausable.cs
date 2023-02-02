@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using TimberApi.EntityLinkerSystem;
+using Timberborn.BlockSystem;
 using Timberborn.Buildings;
 using Timberborn.MechanicalSystem;
 using Timberborn.Persistence;
@@ -14,19 +15,21 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.EntityAction
 {
     public class PowerShaftPausable : TickableComponent, IPausableComponent
     {
-        private bool? Paused = null;
+        private bool Paused = false;
         private MechanicalNode _mechanicalNode;
         private PausableBuilding _pausableBuilding;
+        private BlockObject _blockObject;
 
         private void Awake()
         {
             _mechanicalNode = GetComponent<MechanicalNode>();
             _pausableBuilding = GetComponent<PausableBuilding>();
+            _blockObject = GetComponent<BlockObject>();
         }
 
         public override void Tick()
         {
-            if (!_mechanicalNode.IsShaft)
+            if (!_mechanicalNode.IsShaft || !_blockObject.Finished)
             {
                 return;
             }

@@ -61,7 +61,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
                                                 .CreateLabel()
                                                 .AddPreset(
                                                     factory => factory.Labels()
-                                                                      .GameTextBig(locKey: "PowerGenerationTriggers.LinkedObjects",
+                                                                      .GameTextBig(locKey: "PowerManagement.Entitylink.LinkedObjects",
                                                                                    builder: builder => builder.SetStyle(style => style.alignSelf = Align.Center)))
                                                 .BuildAndInitialize())
                                     .AddComponent(

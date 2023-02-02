@@ -49,9 +49,26 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
                                                     .AddComponent(CreateLinkButton(buttonLabelText))
                                                     .AddComponent(CreateRemoveButton())
                                                     .Build())
-                                        .Build()); ;
-
-
+                                        .Build())
+                            .AddComponent(
+                                _builder.CreateComponentBuilder()
+                                    .CreateVisualElement()
+                                    .AddPreset(factory => factory.Labels()
+                                        .GameTextBig(name: "Threshold1Label",
+                                            builder: builder => builder.SetMargin(new Margin(0, 0, 0, new Length(2, Pixel)))))
+                                    .AddPreset(
+                                        factory => factory.Sliders()
+                                            .SliderCircle(0f, 1f, name: "Threshold1Slider",
+                                                        builder: sliderBuilder => sliderBuilder.SetStyle(style => style.flexGrow = 1f)
+                                                                                                .SetPadding(new Padding(new Length(21, Pixel), 0))))
+                                    .AddPreset(factory => factory.Labels()
+                                        .GameTextBig(name: "Threshold2Label",
+                                            builder: builder => builder.SetMargin(new Margin(0, 0, 0, new Length(2, Pixel)))))
+                                    .AddPreset(factory => factory.Sliders()
+                                        .SliderCircle(0f, 1f, name: "Threshold2Slider",
+                                            builder: sliderBuilder => sliderBuilder.SetStyle(style => style.flexGrow = 1f)
+                                                .SetPadding(new Padding(new Length(21, Pixel), 0))))
+                                    .Build());
 
             var root = rootBuilder.BuildAndInitialize();
 
@@ -73,15 +90,11 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
                                        .SetHeight(new Length(28, Pixel))
                                        .SetMargin(new Margin(new Length(1, Pixel), 0, 0, new Length(6, Pixel)))
                                        .Build())
-                           .AddPreset(factory =>
-                                factory.Labels()
-                                       .GameTextBig(text: buttonLabelText,
-                                                    builder: builder => builder.SetWidth(new Length(180, Pixel))
-                                                                               .SetStyle(style =>
-                                                                               {
-                                                                                   style.unityTextAlign = TextAnchor.MiddleLeft;
-                                                                                   style.paddingLeft = new Length(3, Pixel);
-                                                                               })))
+                           .AddPreset(factory => factory.Labels()
+                                .GameTextBig(text: buttonLabelText))
+                           .AddPreset(factory => factory.Labels()
+                                .GameTextBig(name: "GravityBatteryCharge",
+                                    builder: builder => builder.SetMargin(new Margin(0, 0, 0, new Length(2, Pixel)))))
                            .Build();
         }
 

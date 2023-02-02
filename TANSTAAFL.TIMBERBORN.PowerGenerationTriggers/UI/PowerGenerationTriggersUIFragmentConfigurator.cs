@@ -18,8 +18,9 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
         public void Configure(IContainerDefinition containerDefinition)
         {
             containerDefinition.Bind<LinkerFragment<BeaverPoweredGenerator>>().AsSingleton();
+            containerDefinition.Bind<LinkerFragment<GoodPoweredGenerator>>().AsSingleton();
             containerDefinition.Bind<EntityLinkViewFactory>().AsSingleton();
-            containerDefinition.Bind<StartLinkingButton>().AsSingleton();
+            containerDefinition.Bind<StartLinkingButton>().AsTransient();
             containerDefinition.Bind<LinkViewFactory>().AsSingleton();
             containerDefinition.Bind<GravityBatteryLinksFragment<GravityBatteryRegisteredComponent>>().AsSingleton();
             containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
@@ -31,11 +32,13 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
         private class EntityPanelModuleProvider : IProvider<EntityPanelModule>
         {
             private readonly LinkerFragment<BeaverPoweredGenerator> _linkerFragment;
+            private readonly LinkerFragment<GoodPoweredGenerator> _linkerFragment2;
             private readonly GravityBatteryLinksFragment<GravityBatteryRegisteredComponent> _gravityBatteryFragment;
 
-            public EntityPanelModuleProvider(LinkerFragment<BeaverPoweredGenerator> linkerFragment, GravityBatteryLinksFragment<GravityBatteryRegisteredComponent> gravityBatteryFragment)
+            public EntityPanelModuleProvider(LinkerFragment<BeaverPoweredGenerator> linkerFragment, LinkerFragment<GoodPoweredGenerator> linkerFragment2, GravityBatteryLinksFragment<GravityBatteryRegisteredComponent> gravityBatteryFragment)
             {
                 _linkerFragment = linkerFragment;
+                _linkerFragment2 = linkerFragment2;
                 _gravityBatteryFragment = gravityBatteryFragment;
             }
 
@@ -43,6 +46,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
             {
                 EntityPanelModule.Builder builder = new EntityPanelModule.Builder();
                 builder.AddBottomFragment(_linkerFragment);
+                builder.AddBottomFragment(_linkerFragment2);
                 builder.AddBottomFragment(_gravityBatteryFragment);
                 return builder.Build();
             }

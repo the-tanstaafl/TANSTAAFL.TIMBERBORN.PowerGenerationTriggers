@@ -9,14 +9,15 @@ using Timberborn.SelectionSystem;
 using Timberborn.ToolSystem;
 using UnityEngine.UIElements;
 using UnityEngine;
+using Timberborn.CoreUI;
 
 namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
 {
     public class StartLinkingButton
     {
-        protected static readonly string StartLinkingTipLocKey = "Entitylink.StartLinkingTip";
-        protected static readonly string StartLinkingTitleLocKey = "Entitylink.StartLinkingTitle";
-        protected static readonly string StartLinkLocKey = "Entitylink.StartLink";
+        protected static readonly string StartLinkingTipLocKey = "PowerManagement.Entitylink.StartLinkingTip";
+        protected static readonly string StartLinkingTitleLocKey = "PowerManagement.Entitylink.StartLinkingTitle";
+        protected static readonly string StartLinkLocKey = "PowerManagement.Entitylink.StartLink";
 
         protected readonly ILoc _loc;
         protected readonly PickObjectTool _pickObjectTool;
@@ -41,7 +42,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
                                        Action createdLinkCallback)
             where T : MonoBehaviour, IRegisteredComponent
         {
-            _button = root.Q<Button>("NewLinkButton");
+            _button = root.Q<Button>(LinkerFragment<T>.NewLinkButtonName);
             _button.clicked += delegate
             {
                 StartLinkEntities<T>(linkerProvider(), createdLinkCallback);
@@ -55,8 +56,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
         /// <typeparam name="T"></typeparam>
         /// <param name="linker"></param>
         /// <param name="createdLinkCallback"></param>
-        protected virtual void StartLinkEntities<T>(EntityLinker linker,
-                                                    Action createdLinkCallback)
+        protected virtual void StartLinkEntities<T>(EntityLinker linker, Action createdLinkCallback)
             where T : MonoBehaviour, IRegisteredComponent
         {
             _pickObjectTool.StartPicking<T>(
@@ -67,6 +67,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
                 {
                     FinishLinkSelection(linker, linkee, createdLinkCallback);
                 });
+            _selectionManager.Select(linker.gameObject);
         }
 
         /// <summary>

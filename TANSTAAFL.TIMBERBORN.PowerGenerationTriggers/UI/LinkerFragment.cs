@@ -15,6 +15,7 @@ using Timberborn.CoreUI;
 using Timberborn.PowerStorage;
 using Timberborn.Stockpiles;
 using TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.EntityAction;
+using static UnityEngine.UIElements.UIR.Implementation.UIRStylePainter;
 
 namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
 {
@@ -25,7 +26,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
         protected EntityLinker _entityLinker;
 
         protected static string LinkContainerName = "LinkContainer";
-        protected static string NewLinkButtonName = "NewLinkButton";
+        internal static string NewLinkButtonName = "NewLinkButton";
 
         protected VisualElement _linksContainer;
 
@@ -38,6 +39,11 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
         private int _maxLinks = 1;
 
         private T _component;
+        private BeaverPoweredGeneratorService _beaverPoweredComponent;
+        private GoodPoweredGeneratorService _goodPoweredComponent;
+        private GravityBattery _gravityBattery;
+
+        private Tuple<Label, Slider, Label, Slider, Label> _settings = null;
 
         public LinkerFragment(
             UIBuilder builder,
@@ -81,7 +87,17 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
 
             _startLinkButton.Initialize<GravityBatteryRegisteredComponent>(_root, () => _entityLinker, delegate
             {
+                foreach (var link in _entityLinker.EntityLinks)
+                {
+                    _gravityBattery = link.Linkee.GetComponent<GravityBattery>();
+                    if (_gravityBattery != null)
+                    {
+                        break;
+                    }
+                }
+
                 RemoveAllLinkViews();
+                ShowFragment(_entityLinker.gameObject);
             });
 
             _root.ToggleDisplayStyle(false);
@@ -92,16 +108,50 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
         {
             _entityLinker = entity.GetComponent<EntityLinker>();
             _component = entity.GetComponent<T>();
+            _beaverPoweredComponent = entity.GetComponent<BeaverPoweredGeneratorService>();
+            _goodPoweredComponent = entity.GetComponent<GoodPoweredGeneratorService>();
 
             if ((bool)_entityLinker && _component != null)
             {
-                AddAllLinkViews();
+                foreach (var link in _entityLinker.EntityLinks)
+                {
+                    _gravityBattery = link.Linkee.GetComponent<GravityBattery>();
+                    if (_gravityBattery != null)
+                    {
+                        break;
+                    }
+
+                    _gravityBattery = link.Linker.GetComponent<GravityBattery>();
+                    if (_gravityBattery != null)
+                    {
+                        break;
+                    }
+                }
+
+                AddLinkView();
+
+                if (_settings != null)
+                {
+                    if (_beaverPoweredComponent != null)
+                    {
+                        _settings.Item2.SetValueWithoutNotify(_beaverPoweredComponent.MinValue);
+                        _settings.Item4.SetValueWithoutNotify(_beaverPoweredComponent.MaxValue);
+                    }
+
+                    if (_goodPoweredComponent != null)
+                    {
+                        _settings.Item2.SetValueWithoutNotify(_goodPoweredComponent.MinValue);
+                        _settings.Item4.SetValueWithoutNotify(_goodPoweredComponent.MaxValue);
+                    }
+                }
             }
         }
 
         public virtual void ClearFragment()
         {
             _entityLinker = null;
+            //_beaverPoweredComponent = null;
+            //_goodPoweredComponent = null;
             _root.ToggleDisplayStyle(false);
             RemoveAllLinkViews();
         }
@@ -110,6 +160,18 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
         {
             if (_entityLinker != null && _component != null)
             {
+                if (_settings != null)
+                {
+                    _settings.Item1.text = $"Enable when charge is below: {_settings.Item2.value*100:##0.0}%";
+                    _settings.Item3.text = $"Disable when charge is above: {_settings.Item4.value*100:##0.0}%";
+
+                    if (_gravityBattery != null)
+                    {
+                        var currChargePercentage = _gravityBattery.Charge / _gravityBattery.Capacity;
+                        _settings.Item5.text = $" {currChargePercentage*100:##0.0}%";
+                    }
+                }
+
                 _root.ToggleDisplayStyle(true);
             }
             else
@@ -121,44 +183,114 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
         /// <summary>
         /// Loops through and adds a view for all existing Links
         /// </summary>
-        public virtual void AddAllLinkViews()
+        public virtual void AddLinkView()
         {
             ReadOnlyCollection<EntityLink> links = (ReadOnlyCollection<EntityLink>)_entityLinker.EntityLinks;
-            for (int i = 0; i < links.Count; i++)
-            {
-                var link = links[i];
-
-                var linkee = link.Linker == _entityLinker
-                    ? link.Linkee
-                    : link.Linker;
-
-                var linkeeGameObject = (linkee).gameObject;
-
-                var prefab = linkeeGameObject.GetComponent<LabeledPrefab>();
-                var sprite = prefab.Image;
-
-                var view = _entityLinkViewFactory.Create(_loc.T(prefab.DisplayNameLocKey));
-
-                var imageContainer = view.Q<VisualElement>("ImageContainer");
-                var img = new Image();
-                img.sprite = sprite;
-                imageContainer.Add(img);
-
-                var targetButton = view.Q<Button>("Target");
-                targetButton.clicked += delegate
-                {
-                    _selectionManager.FocusOn(linkeeGameObject);
-                };
-                view.Q<Button>("RemoveLinkButton").clicked += delegate
-                {
-                    link.Linker.DeleteLink(link);
-                    ResetLinks();
-                };
-
-                _linksContainer.Add(view);
-            }
 
             _startLinkButton.UpdateRemainingSlots(links.Count, _maxLinks);
+
+            if (links.Count == 0)
+            {
+                return;
+            }
+
+            var link = links[0];
+
+            var linkee = link.Linker == _entityLinker
+                ? link.Linkee
+                : link.Linker;
+
+            var linkeeGameObject = linkee.gameObject;
+
+            var prefab = linkeeGameObject.GetComponent<LabeledPrefab>();
+            var sprite = prefab.Image;
+
+            var view = _entityLinkViewFactory.Create(_loc.T(prefab.DisplayNameLocKey));
+
+            var imageContainer = view.Q<VisualElement>("ImageContainer");
+            var img = new Image();
+            img.sprite = sprite;
+            imageContainer.Add(img);
+
+            var targetButton = view.Q<Button>("Target");
+            targetButton.clicked += delegate
+            {
+                _selectionManager.FocusOn(linkeeGameObject);
+            };
+            view.Q<Button>("RemoveLinkButton").clicked += delegate
+            {
+                link.Linker.DeleteLink(link);
+                ResetLinks();
+            };
+
+            var threshold1Label = view.Q<Label>("Threshold1Label");
+            var threshold1Slider = view.Q<Slider>("Threshold1Slider");
+            threshold1Slider.RegisterValueChangedCallback((@event) => ChangeThresholdSlider(@event, 0));
+            var threshold2Label = view.Q<Label>("Threshold2Label");
+            var threshold2Slider = view.Q<Slider>("Threshold2Slider");
+            threshold2Slider.RegisterValueChangedCallback((@event) => ChangeThresholdSlider(@event, 1));
+            var gaugeHeightLabel = view.Q<Label>("GravityBatteryCharge");
+
+            _settings = new Tuple<Label, Slider, Label, Slider, Label>(threshold1Label, threshold1Slider, threshold2Label, threshold2Slider, gaugeHeightLabel);
+
+            _linksContainer.Add(view);
+        }
+
+        public void ChangeThresholdSlider(ChangeEvent<float> changeEvent, int sliderIndex)
+        {
+            Slider slider;
+            if (sliderIndex == 0)
+            {
+                slider = _settings.Item2;
+                if (_beaverPoweredComponent != null)
+                {
+                    _beaverPoweredComponent.MinValue = changeEvent.newValue;
+
+                    if (_beaverPoweredComponent.MinValue > _beaverPoweredComponent.MaxValue)
+                    {
+                        _beaverPoweredComponent.MaxValue = changeEvent.newValue;
+                        _settings.Item4.SetValueWithoutNotify(changeEvent.newValue);
+                    }
+                }
+
+                if (_goodPoweredComponent != null)
+                {
+                    _goodPoweredComponent.MinValue = changeEvent.newValue;
+
+                    if (_goodPoweredComponent.MinValue > _goodPoweredComponent.MaxValue)
+                    {
+                        _goodPoweredComponent.MaxValue = changeEvent.newValue;
+                        _settings.Item4.SetValueWithoutNotify(changeEvent.newValue);
+                    }
+                }
+            }
+            else
+            {
+                slider = _settings.Item4;
+                if (_beaverPoweredComponent != null)
+                {
+                    _beaverPoweredComponent.MaxValue = changeEvent.newValue;
+
+                    if (_beaverPoweredComponent.MaxValue < _beaverPoweredComponent.MinValue)
+                    {
+                        _beaverPoweredComponent.MinValue = changeEvent.newValue;
+                        _settings.Item2.SetValueWithoutNotify(changeEvent.newValue);
+                    }
+                }
+
+                if (_goodPoweredComponent != null)
+                {
+                    _goodPoweredComponent.MaxValue = changeEvent.newValue;
+
+                    if (_goodPoweredComponent.MaxValue < _goodPoweredComponent.MinValue)
+                    {
+                        _goodPoweredComponent.MinValue = changeEvent.newValue;
+                        _settings.Item2.SetValueWithoutNotify(changeEvent.newValue);
+                    }
+                }
+            }
+
+            slider.SetValueWithoutNotify(changeEvent.newValue);
         }
 
         /// <summary>
@@ -168,7 +300,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
         public virtual void ResetLinks()
         {
             RemoveAllLinkViews();
-            AddAllLinkViews();
+            AddLinkView();
             UpdateFragment();
         }
 

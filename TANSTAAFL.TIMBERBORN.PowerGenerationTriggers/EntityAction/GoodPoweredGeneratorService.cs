@@ -11,13 +11,13 @@ using Timberborn.TickSystem;
 
 namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.EntityAction
 {
-    public class BeaverPoweredGeneratorService : TickableComponent, IPersistentEntity
+    public class GoodPoweredGeneratorService : TickableComponent, IPersistentEntity
     {
-        private static readonly ComponentKey BeaverPoweredGeneratorServiceKey = new (nameof(BeaverPoweredGeneratorService));
+        private static readonly ComponentKey GoodPoweredGeneratorServiceKey = new (nameof(GoodPoweredGeneratorService));
         private static readonly PropertyKey<float> MinValueKey = new PropertyKey<float>("MinValue");
         private static readonly PropertyKey<float> MaxValueKey = new PropertyKey<float>("MaxValue");
 
-        private PausableBuilding _beaverPoweredGeneratorPausable;
+        private PausableBuilding _goodPoweredGeneratorPausable;
         private EntityLinker _linker;
 
         public float MinValue { get; set; }
@@ -25,22 +25,22 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.EntityAction
 
         private void Awake()
         {
-            _beaverPoweredGeneratorPausable = this.GetComponent<PausableBuilding>();
+            _goodPoweredGeneratorPausable = this.GetComponent<PausableBuilding>();
             _linker = GetComponent<EntityLinker>();
         }
 
         public void Save(IEntitySaver entitySaver)
         {
-            entitySaver.GetComponent(BeaverPoweredGeneratorServiceKey).Set(MinValueKey, MinValue);
-            entitySaver.GetComponent(BeaverPoweredGeneratorServiceKey).Set(MaxValueKey, MaxValue);
+            entitySaver.GetComponent(GoodPoweredGeneratorServiceKey).Set(MinValueKey, MinValue);
+            entitySaver.GetComponent(GoodPoweredGeneratorServiceKey).Set(MaxValueKey, MaxValue);
         }
 
         public void Load(IEntityLoader entityLoader)
         {
-            if (entityLoader.HasComponent(BeaverPoweredGeneratorServiceKey))
+            if (entityLoader.HasComponent(GoodPoweredGeneratorServiceKey))
             {
-                MinValue = entityLoader.GetComponent(BeaverPoweredGeneratorServiceKey).Get(MinValueKey);
-                MaxValue = entityLoader.GetComponent(BeaverPoweredGeneratorServiceKey).Get(MaxValueKey);
+                MinValue = entityLoader.GetComponent(GoodPoweredGeneratorServiceKey).Get(MinValueKey);
+                MaxValue = entityLoader.GetComponent(GoodPoweredGeneratorServiceKey).Get(MaxValueKey);
             }
         }
 
@@ -59,15 +59,15 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.EntityAction
 
                 var currChargePercentage = gravityBattery.Charge / gravityBattery.Capacity;
 
-                if (currChargePercentage < MinValue && _beaverPoweredGeneratorPausable.Paused)
+                if (currChargePercentage < MinValue && _goodPoweredGeneratorPausable.Paused)
                 {
-                    _beaverPoweredGeneratorPausable.Resume();
+                    _goodPoweredGeneratorPausable.Resume();
                     continue;
                 }
 
-                if (currChargePercentage >= MaxValue && !_beaverPoweredGeneratorPausable.Paused)
+                if (currChargePercentage >= MaxValue && !_goodPoweredGeneratorPausable.Paused)
                 {
-                    _beaverPoweredGeneratorPausable.Pause();
+                    _goodPoweredGeneratorPausable.Pause();
                 }
             }
         }
