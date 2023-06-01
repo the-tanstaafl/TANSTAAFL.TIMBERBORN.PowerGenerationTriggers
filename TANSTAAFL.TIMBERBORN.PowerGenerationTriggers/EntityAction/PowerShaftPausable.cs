@@ -5,6 +5,7 @@ using System.Text;
 using TimberApi.EntityLinkerSystem;
 using Timberborn.BlockSystem;
 using Timberborn.Buildings;
+using Timberborn.BuildingsBlocking;
 using Timberborn.MechanicalSystem;
 using Timberborn.Persistence;
 using Timberborn.PowerStorage;
@@ -22,9 +23,9 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.EntityAction
 
         private void Awake()
         {
-            _mechanicalNode = GetComponent<MechanicalNode>();
-            _pausableBuilding = GetComponent<PausableBuilding>();
-            _blockObject = GetComponent<BlockObject>();
+            _mechanicalNode = GetComponentFast<MechanicalNode>();
+            _pausableBuilding = GetComponentFast<PausableBuilding>();
+            _blockObject = GetComponentFast<BlockObject>();
         }
 
         public override void Tick()

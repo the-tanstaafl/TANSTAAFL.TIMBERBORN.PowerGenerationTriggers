@@ -1,7 +1,9 @@
 ﻿using Bindito.Core;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using Timberborn.BaseComponentSystem;
 using Timberborn.ConstructibleSystem;
 using Timberborn.EntitySystem;
 using Timberborn.PowerStorage;
@@ -10,28 +12,14 @@ using UnityEngine;
 
 namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.EntityAction
 {
-    public class GravityBatteryRegisteredComponent : MonoBehaviour, IRegisteredComponent, IFinishedStateListener
+    public class GravityBatteryRegisteredComponent : BaseComponent, IRegisteredComponent, IFinishedStateListener
     {
-        private EntityComponentRegistry _entityComponentRegistry;
-
-        public GravityBattery GravityBattery;
-
-        [Inject]
-        public void InjectDependencies(EntityComponentRegistry entityComponentRegistry)
-        {
-            _entityComponentRegistry = entityComponentRegistry;
-        }
-
         public void OnEnterFinishedState()
         {
-            _entityComponentRegistry.Register(this);
-            GravityBattery = this.GetComponent<GravityBattery>();
         }
 
         public void OnExitFinishedState()
         {
-            _entityComponentRegistry.Unregister(this);
-            GravityBattery = null;
         }
     }
 }

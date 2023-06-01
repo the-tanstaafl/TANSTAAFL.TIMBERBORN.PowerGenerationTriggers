@@ -31,7 +31,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers
         private static TemplateModule ProvideTemplateModule()
         {
             TemplateModule.Builder builder = new TemplateModule.Builder();
-            builder.AddDecorator<BeaverPoweredGenerator, BeaverPoweredGeneratorService>();
+            builder.AddDecorator<WalkerPoweredGenerator, BeaverPoweredGeneratorService>();
             builder.AddDecorator<GoodPoweredGenerator, GoodPoweredGeneratorService>();
             builder.AddDecorator<GravityBattery, GravityBatteryRegisteredComponent>();
             builder.AddDecorator<MechanicalNode, PowerShaftPausable>();

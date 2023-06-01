@@ -16,6 +16,7 @@ using Timberborn.PowerStorage;
 using Timberborn.Stockpiles;
 using TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.EntityAction;
 using static UnityEngine.UIElements.UIR.Implementation.UIRStylePainter;
+using Timberborn.BaseComponentSystem;
 
 namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
 {
@@ -33,7 +34,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
         protected StartLinkingButton _startLinkButton;
 
         protected EntityLinkViewFactory _entityLinkViewFactory;
-        protected readonly SelectionManager _selectionManager;
+        protected readonly EntitySelectionService _selectionManager;
         protected readonly ILoc _loc;
 
         private int _maxLinks = 1;
@@ -49,7 +50,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
             UIBuilder builder,
             EntityLinkViewFactory entityLinkViewFactory,
             StartLinkingButton startLinkButton,
-            SelectionManager selectionManager,
+            EntitySelectionService selectionManager,
             ILoc loc)
         {
             _builder = builder ?? throw new ArgumentNullException(nameof(builder));
@@ -89,7 +90,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
             {
                 foreach (var link in _entityLinker.EntityLinks)
                 {
-                    _gravityBattery = link.Linkee.GetComponent<GravityBattery>();
+                    _gravityBattery = link.Linkee.GetComponentFast<GravityBattery>();
                     if (_gravityBattery != null)
                     {
                         break;
@@ -97,31 +98,31 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
                 }
 
                 RemoveAllLinkViews();
-                ShowFragment(_entityLinker.gameObject);
+                ShowFragment(_entityLinker.GameObjectFast.GetComponent<BaseComponent>());
             });
 
             _root.ToggleDisplayStyle(false);
             return _root;
         }
 
-        public virtual void ShowFragment(GameObject entity)
+        public virtual void ShowFragment(BaseComponent entity)
         {
-            _entityLinker = entity.GetComponent<EntityLinker>();
-            _component = entity.GetComponent<T>();
-            _beaverPoweredComponent = entity.GetComponent<BeaverPoweredGeneratorService>();
-            _goodPoweredComponent = entity.GetComponent<GoodPoweredGeneratorService>();
+            _entityLinker = entity.GetComponentFast<EntityLinker>();
+            _component = entity.GetComponentFast<T>();
+            _beaverPoweredComponent = entity.GetComponentFast<BeaverPoweredGeneratorService>();
+            _goodPoweredComponent = entity.GetComponentFast<GoodPoweredGeneratorService>();
 
             if ((bool)_entityLinker && _component != null)
             {
                 foreach (var link in _entityLinker.EntityLinks)
                 {
-                    _gravityBattery = link.Linkee.GetComponent<GravityBattery>();
+                    _gravityBattery = link.Linkee.GetComponentFast<GravityBattery>();
                     if (_gravityBattery != null)
                     {
                         break;
                     }
 
-                    _gravityBattery = link.Linker.GetComponent<GravityBattery>();
+                    _gravityBattery = link.Linker.GetComponentFast<GravityBattery>();
                     if (_gravityBattery != null)
                     {
                         break;
@@ -200,7 +201,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
                 ? link.Linkee
                 : link.Linker;
 
-            var linkeeGameObject = linkee.gameObject;
+            var linkeeGameObject = linkee.GameObjectFast;
 
             var prefab = linkeeGameObject.GetComponent<LabeledPrefab>();
             var sprite = prefab.Image;
@@ -215,7 +216,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
             var targetButton = view.Q<Button>("Target");
             targetButton.clicked += delegate
             {
-                _selectionManager.FocusOn(linkeeGameObject);
+                _selectionManager.FocusOnSelectable(linkeeGameObject.GetComponent<SelectableObject>());
             };
             view.Q<Button>("RemoveLinkButton").clicked += delegate
             {

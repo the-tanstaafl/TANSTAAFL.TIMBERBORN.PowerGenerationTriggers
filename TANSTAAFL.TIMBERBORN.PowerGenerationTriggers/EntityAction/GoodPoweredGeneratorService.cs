@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using TimberApi.EntityLinkerSystem;
 using Timberborn.Buildings;
+using Timberborn.BuildingsBlocking;
 using Timberborn.Persistence;
 using Timberborn.PowerGenerating;
 using Timberborn.PowerStorage;
@@ -25,8 +26,8 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.EntityAction
 
         private void Awake()
         {
-            _goodPoweredGeneratorPausable = this.GetComponent<PausableBuilding>();
-            _linker = GetComponent<EntityLinker>();
+            _goodPoweredGeneratorPausable = this.GetComponentFast<PausableBuilding>();
+            _linker = GetComponentFast<EntityLinker>();
         }
 
         public void Save(IEntitySaver entitySaver)
@@ -54,8 +55,8 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.EntityAction
             foreach (var link in _linker.EntityLinks)
             {
                 var gravityBattery = link.Linker == _linker
-                    ? link.Linkee.GetComponent<GravityBattery>()
-                    : link.Linker.GetComponent<GravityBattery>();
+                    ? link.Linkee.GetComponentFast<GravityBattery>()
+                    : link.Linker.GetComponentFast<GravityBattery>();
 
                 var currChargePercentage = gravityBattery.Charge / gravityBattery.Capacity;
 

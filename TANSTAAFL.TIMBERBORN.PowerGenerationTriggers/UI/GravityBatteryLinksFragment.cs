@@ -13,6 +13,7 @@ using Timberborn.PrefabSystem;
 using System.Collections.ObjectModel;
 using Timberborn.Common;
 using TimberApi.EntityLinkerSystem;
+using Timberborn.BaseComponentSystem;
 
 namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
 {
@@ -29,14 +30,14 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
         private Sprite _powerWheelSprite;
 
         LinkViewFactory _linkViewFactory;
-        private readonly SelectionManager _selectionManager;
+        private readonly EntitySelectionService _selectionManager;
 
         private T _component;
 
         public GravityBatteryLinksFragment(
             UIBuilder builder,
             LinkViewFactory linkViewFactory,
-            SelectionManager selectionManager)
+            EntitySelectionService selectionManager)
         {
             _builder = builder;
             _linkViewFactory = linkViewFactory;
@@ -80,7 +81,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
                                .CreateLabel()
                                .AddPreset(factory => factory.Labels()
                                                             .GameTextBig(name: "NoLinksLabel",
-                                                                         locKey: "Floodgates.Triggers.NoFloodgateLinks",
+                                                                         locKey: "PowerManagement.Entitylink.NoLinkedObjects",
                                                                          builder: builder =>
                                                                             builder.SetStyle(style =>
                                                                                 style.alignSelf = Align.Center)))
@@ -90,10 +91,10 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
             return _root;
         }
 
-        public void ShowFragment(GameObject entity)
+        public void ShowFragment(BaseComponent entity)
         {
-            _entityLinker = entity.GetComponent<EntityLinker>();
-            _component = entity.GetComponent<T>();
+            _entityLinker = entity.GetComponentFast<EntityLinker>();
+            _component = entity.GetComponentFast<T>();
 
             if ((bool)_entityLinker && _component != null)
             {
@@ -124,7 +125,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
 
             foreach (var link in _entityLinker.EntityLinks)
             {
-                var powerWheel = link.Linker.gameObject;
+                var powerWheel = link.Linker.GameObjectFast;
                 var labeledPrefab = powerWheel.GetComponent<LabeledPrefab>();
                 var view = _linkViewFactory.CreateViewForGravityBattery(labeledPrefab.DisplayNameLocKey);
 
@@ -136,7 +137,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
                 var targetButton = view.Q<Button>("Target");
                 targetButton.clicked += delegate
                 {
-                    _selectionManager.FocusOn(powerWheel);
+                    _selectionManager.FocusOnSelectable(powerWheel.GetComponent<SelectableObject>());
                 };
 
                 view.Q<Button>("DetachLinkButton").clicked += delegate

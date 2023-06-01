@@ -3,3 +3,4 @@ PowerManagement.Entitylink.StartLinkingTip, "No really, pick any."
 PowerManagement.Entitylink.StartLinkingTitle, Pick a Gravity Battery
 PowerManagement.Entitylink.StartLink, Attach Gravity Battery
 PowerManagement.Entitylink.LinkedObjects, Linked objects
+PowerManagement.Entitylink.NoLinkedObjects, No Linked objects

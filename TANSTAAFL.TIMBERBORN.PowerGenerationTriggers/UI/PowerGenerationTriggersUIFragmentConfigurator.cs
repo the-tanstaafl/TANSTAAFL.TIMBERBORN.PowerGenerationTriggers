@@ -17,7 +17,7 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
     {
         public void Configure(IContainerDefinition containerDefinition)
         {
-            containerDefinition.Bind<LinkerFragment<BeaverPoweredGenerator>>().AsSingleton();
+            containerDefinition.Bind<LinkerFragment<WalkerPoweredGenerator>>().AsSingleton();
             containerDefinition.Bind<LinkerFragment<GoodPoweredGenerator>>().AsSingleton();
             containerDefinition.Bind<EntityLinkViewFactory>().AsSingleton();
             containerDefinition.Bind<StartLinkingButton>().AsTransient();
@@ -31,11 +31,11 @@ namespace TANSTAAFL.TIMBERBORN.PowerGenerationTriggers.UI
         /// </summary>
         private class EntityPanelModuleProvider : IProvider<EntityPanelModule>
         {
-            private readonly LinkerFragment<BeaverPoweredGenerator> _linkerFragment;
+            private readonly LinkerFragment<WalkerPoweredGenerator> _linkerFragment;
             private readonly LinkerFragment<GoodPoweredGenerator> _linkerFragment2;
             private readonly GravityBatteryLinksFragment<GravityBatteryRegisteredComponent> _gravityBatteryFragment;
 
-            public EntityPanelModuleProvider(LinkerFragment<BeaverPoweredGenerator> linkerFragment, LinkerFragment<GoodPoweredGenerator> linkerFragment2, GravityBatteryLinksFragment<GravityBatteryRegisteredComponent> gravityBatteryFragment)
+            public EntityPanelModuleProvider(LinkerFragment<WalkerPoweredGenerator> linkerFragment, LinkerFragment<GoodPoweredGenerator> linkerFragment2, GravityBatteryLinksFragment<GravityBatteryRegisteredComponent> gravityBatteryFragment)
             {
                 _linkerFragment = linkerFragment;
                 _linkerFragment2 = linkerFragment2;
